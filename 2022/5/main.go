@@ -31,24 +31,14 @@ func main() {
 		}
 
 		if row > 9 && line != "" {
-			MoveCrates(line, initialCrates)
+			// MoveCratesWithCrane9000(line, initialCrates)
+			MoveCratesWithCrane9001(line, initialCrates)
 		}
 		row++
 	}
 
 	cratesOnTop = ReadTopCrates(initialCrates)
 	fmt.Println(cratesOnTop)
-}
-
-func ReadInitialCratesByLetter(line string, initialCrates [][]string) {
-	line += " "
-	ll := len(line)
-	for i := 0; i < ll; i += 4 {
-		sl := strings.Trim(line[i:i+4], " ")
-		if sl != "" {
-			initialCrates[i/4] = append(initialCrates[i/4], sl[1:2])
-		}
-	}
 }
 
 func ReadInitialCrates(line string, initialCrates [][]string) {
@@ -62,7 +52,8 @@ func ReadInitialCrates(line string, initialCrates [][]string) {
 	}
 }
 
-func MoveCrates(line string, crates [][]string) {
+// MoveCratesWithCrane9000 https://adventofcode.com/2022/day/5#part1
+func MoveCratesWithCrane9000(line string, crates [][]string) {
 	words := strings.Split(line, " ")
 	howMany, _ := strconv.ParseInt(words[1], 10, 32)
 	from, _ := strconv.ParseInt(words[3], 10, 32)
@@ -77,6 +68,22 @@ func MoveCrates(line string, crates [][]string) {
 	for i := len(cratesToMove) - 1; i >= 0; i-- {
 		crates[ti] = append(crates[ti], cratesToMove[i])
 	}
+}
+
+// MoveCratesWithCrane9001 https://adventofcode.com/2022/day/5#part2
+func MoveCratesWithCrane9001(line string, crates [][]string) {
+	words := strings.Split(line, " ")
+	howMany, _ := strconv.ParseInt(words[1], 10, 32)
+	from, _ := strconv.ParseInt(words[3], 10, 32)
+	to, _ := strconv.ParseInt(words[5], 10, 32)
+
+	hmi := int(howMany)
+	fi := from - 1
+	ti := to - 1
+
+	cratesToMove := crates[fi][len(crates[fi])-hmi:]
+	crates[fi] = crates[fi][0 : len(crates[fi])-hmi]
+	crates[ti] = append(crates[ti], cratesToMove...)
 }
 
 func ReadTopCrates(crates [][]string) string {

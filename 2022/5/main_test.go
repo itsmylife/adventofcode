@@ -42,7 +42,7 @@ func TestReadInitialCrates(t *testing.T) {
 	}
 }
 
-func TestMoveCrates(t *testing.T) {
+func TestMoveCratesWithCrane9000(t *testing.T) {
 	cases := []struct {
 		line     string
 		crates   [][]string
@@ -58,7 +58,31 @@ func TestMoveCrates(t *testing.T) {
 
 	for _, c := range cases {
 
-		MoveCrates(c.line, c.crates)
+		MoveCratesWithCrane9000(c.line, c.crates)
+
+		if !reflect.DeepEqual(c.crates, c.expected) {
+			t.Error(fmt.Sprintf("Line: %s failed. Expected: %v but got: %v", c.line, c.expected, c.crates))
+		}
+	}
+}
+
+func TestMoveCratesWithCrane9001(t *testing.T) {
+	cases := []struct {
+		line     string
+		crates   [][]string
+		expected [][]string
+	}{
+		{
+			line:   "move 2 from 7 to 2",
+			crates: [][]string{{"[H]"}, {"[Q]"}, {"[P]"}, {"[L]"}, {"[G]"}, {"[V]"}, {"[Z]", "[C]"}, {"[D]"}, {"[B]"}},
+			expected: [][]string{{"[H]"}, {"[Q]", "[Z]", "[C]"}, {"[P]"}, {"[L]"}, {"[G]"}, {"[V]"}, {}, {"[D]"},
+				{"[B]"}},
+		},
+	}
+
+	for _, c := range cases {
+
+		MoveCratesWithCrane9001(c.line, c.crates)
 
 		if !reflect.DeepEqual(c.crates, c.expected) {
 			t.Error(fmt.Sprintf("Line: %s failed. Expected: %v but got: %v", c.line, c.expected, c.crates))
