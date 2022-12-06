@@ -37,7 +37,7 @@ func main() {
 		char := string(b[:readTotal])
 		ri++
 
-		u, m := FindMarker(char, token)
+		u, m := FindMarker(char, token, 14)
 		token = m
 
 		if u {
@@ -48,7 +48,7 @@ func main() {
 	fmt.Println(fmt.Sprintf("Last index read: %d -- and the marker is %s", ri, token))
 }
 
-func FindMarker(c string, token string) (unique bool, marker string) {
+func FindMarker(c string, token string, charLength int) (unique bool, marker string) {
 
 	if len(token) == 0 {
 		return false, c
@@ -63,7 +63,7 @@ func FindMarker(c string, token string) (unique bool, marker string) {
 
 	token += c
 
-	if len(token) == 4 {
+	if len(token) == charLength {
 		return true, token
 	}
 
