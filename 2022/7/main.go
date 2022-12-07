@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"strconv"
 	"strings"
 
@@ -15,13 +16,19 @@ type Node struct {
 	size   int64
 }
 
+const totalSpace int64 = 70000000
+const minRequiredSpace int64 = 30000000
+
 func main() {
 	fileScanner, closeFile := helper.ReadFile("7")
 	defer closeFile()
 
-	var dirMap = make(map[string]Node)
 	pwd := ""
 	lineNum := 0
+	var dirMap = make(map[string]Node)
+
+	var sizeToDelete int64 = math.MaxInt64
+
 	for fileScanner.Scan() {
 		line := fileScanner.Text()
 
@@ -67,15 +74,27 @@ func main() {
 		}
 	}
 
+	var minSpaceToDelete int64 = 0
+	if rootNode, ok := dirMap["/"]; ok {
+		fmt.Println(fmt.Sprintf("free space left: %d", totalSpace-rootNode.size))
+		freeSpace := totalSpace - rootNode.size
+		minSpaceToDelete = minRequiredSpace - freeSpace
+	}
+
 	var total int64 = 0
 	for k, v := range dirMap {
 		if v.size < 100000 {
 			fmt.Println(k)
 			total += v.size
 		}
+
+		if v.size > minSpaceToDelete && v.size < sizeToDelete {
+			sizeToDelete = v.size
+		}
 	}
 
 	fmt.Println(fmt.Sprintf("The sum is: %d", total))
+	fmt.Println(fmt.Sprintf("Minimum to delete: %d", sizeToDelete))
 }
 
 func UpdateSize(fs int64, pwd string, dirMap map[string]Node) {
