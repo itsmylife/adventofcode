@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 
 	"github.com/itsmylife/adventofcode/2022/helper"
@@ -31,12 +32,72 @@ func main() {
 	}
 
 	visibleTrees := FindVisibleTreeCount(treeMap)
+	scenicScore := FindScenicScore(treeMap)
 
 	fmt.Println(fmt.Sprintf("Total visible tree count is : %d", visibleTrees))
+	fmt.Println(fmt.Sprintf("Highest scenic score is : %f", scenicScore))
 }
 
-func FindScenicScore() int {
-	return 0
+func FindScenicScore(input []string) float64 {
+	var highest float64 = 0
+	// We assume cols and rows has same length
+	ll := len(input[0])
+
+	for r := 1; r < ll-1; r++ {
+		for c := 1; c < ll-1; c++ {
+			t := ci(input[r][c])
+
+			sl := 0
+			sr := 0
+			st := 0
+			sb := 0
+
+			// Go left in the row
+			for i := c - 1; i >= 0; i-- {
+				rl := ci(input[r][i])
+				sl++
+				if rl >= t {
+					break
+				}
+			}
+
+			// Go right in the row
+			for i := c + 1; i < ll; i++ {
+				rr := ci(input[r][i])
+				sr++
+				if rr >= t {
+					break
+				}
+			}
+
+			// Go top in the column
+			for i := r - 1; i >= 0; i-- {
+				ct := ci(input[i][c])
+				st++
+				if ct >= t {
+					break
+				}
+			}
+
+			// Go bottom in the column
+			for i := r + 1; i < ll; i++ {
+				cb := ci(input[i][c])
+				sb++
+				if cb >= t {
+					break
+				}
+			}
+
+			score := math.Max(float64(sr), 1) * math.Max(float64(sl), 1) * math.Max(float64(st),
+				1) * math.Max(float64(sb), 1)
+
+			if score > highest {
+				highest = score
+			}
+		}
+	}
+
+	return highest
 }
 
 func CalculateHighest(line string, li int, rows, cols []int64) ([]int64, []int64) {
@@ -56,7 +117,6 @@ func CalculateHighest(line string, li int, rows, cols []int64) ([]int64, []int64
 }
 
 func FindVisibleTreeCount(input []string) int {
-
 	// We assume cols and rows has same length
 	ll := len(input[0])
 	visible := ll*2 + (ll-2)*2

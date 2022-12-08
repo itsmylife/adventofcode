@@ -7,7 +7,28 @@ import (
 )
 
 func TestFindScenicScore(t *testing.T) {
+	cases := []struct {
+		input    []string
+		expected float64
+	}{
+		{
+			input: []string{
+				"30373",
+				"25512",
+				"65332",
+				"33549",
+				"35390",
+			},
+			expected: 8,
+		},
+	}
 
+	for _, c := range cases {
+		result := FindScenicScore(c.input)
+		if result != c.expected {
+			t.Error(fmt.Sprintf("Fail. Expected: %v but got: %v", c.expected, result))
+		}
+	}
 }
 
 func TestFindVisibleTreeCount(t *testing.T) {
