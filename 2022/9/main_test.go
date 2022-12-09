@@ -250,11 +250,17 @@ func TestGetDirectionToMove(t *testing.T) {
 	}
 }
 
-func TestMoveOnTheRope(t *testing.T) {
+func TestMoveTheRope_2Knots(t *testing.T) {
 	cases := []struct {
 		input    []string
 		expected int
 	}{
+		{
+			input: []string{
+				"R 3",
+			},
+			expected: 3,
+		},
 		{
 			input: []string{
 				"R 12",
@@ -281,16 +287,38 @@ func TestMoveOnTheRope(t *testing.T) {
 		var visitMap = map[string]int{
 			"": 1,
 		}
-		headPos := &Pos{
-			x: 0,
-			y: 0,
+		var knot2 = GenerateKnots(2)
+		for _, v := range c.input {
+			visitMap = MoveTheRope(v, visitMap, knot2)
 		}
-		tailPos := &Pos{
-			x: 0,
-			y: 0,
+		result := len(visitMap)
+		if result != c.expected {
+			errStr := fmt.Sprintf("Fail. Expected: %v but got: %v\n", c.expected, result)
+			t.Error(errStr)
 		}
-		for i, v := range c.input {
-			visitMap = MoveOnTheRope(v, visitMap, headPos, tailPos, i)
+	}
+}
+
+func TestMoveTheRope_10Knots(t *testing.T) {
+	cases := []struct {
+		input    []string
+		expected int
+	}{
+		{
+			input: []string{
+				"R 12",
+			},
+			expected: 3,
+		},
+	}
+
+	for _, c := range cases {
+		var visitMap = map[string]int{
+			"": 1,
+		}
+		var knots = GenerateKnots(10)
+		for _, v := range c.input {
+			visitMap = MoveTheRope(v, visitMap, knots)
 		}
 		result := len(visitMap)
 		if result != c.expected {

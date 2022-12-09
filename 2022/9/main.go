@@ -22,40 +22,60 @@ func main() {
 	fileScanner, closeFile := helper.ReadFile("9")
 	defer closeFile()
 
-	var visitMap = map[string]int{
+	knot2 := GenerateKnots(2)
+	knot10 := GenerateKnots(10)
+	var visitMap2Knots = map[string]int{
+		"": 1,
+	}
+	var visitMap10Knots = map[string]int{
 		"": 1,
 	}
 
 	li := 0
-	headPos := &Pos{
-		x: 0,
-		y: 0,
-	}
-	tailPos := &Pos{
-		x: 0,
-		y: 0,
-	}
 	for fileScanner.Scan() {
 		line := fileScanner.Text()
-		visitMap = MoveOnTheRope(line, visitMap, headPos, tailPos, li)
+		visitMap2Knots = MoveTheRope(line, visitMap2Knots, knot2)
+		visitMap10Knots = MoveTheRope(line, visitMap10Knots, knot10)
 		li++
 	}
 
-	visits := len(visitMap)
+	shortKnotTail := len(visitMap2Knots)
+	longKnotTail := len(visitMap10Knots)
 
-	fmt.Println(fmt.Sprintf("Total visits : %d", visits))
+	fmt.Println(fmt.Sprintf("Total shortKnotTail : %d", shortKnotTail))
+	fmt.Println(fmt.Sprintf("Total longKnotTail : %d", longKnotTail))
 }
 
-func MoveOnTheRope(line string, vm map[string]int, hp, tp *Pos, li int) map[string]int {
+func GenerateKnots(count int) []*Pos {
+	var knots []*Pos
+	for i := 0; i < count; i++ {
+		knots = append(knots, &Pos{
+			x: 0,
+			y: 0,
+		})
+	}
+	return knots
+}
+
+func MoveTheRope(line string, vm map[string]int, kn []*Pos) map[string]int {
 	ps := strings.Split(line, " ")
-	c := ci(ps[1])
-	for i := 0; i < c; i++ {
-		Move(Dir{
-			direction: ps[0],
-		}, hp)
-		pos := MoveTail(hp, tp)
-		if _, ok := vm[pos]; !ok {
-			vm[pos] = 1
+	direction := ps[0]
+	count := ci(ps[1])
+	kl := len(kn)
+	for i := 0; i < count; i++ {
+		for j := 1; j < kl; j++ {
+			Move(Dir{
+				direction: direction,
+			}, kn[j-1])
+
+			for k := j; k < kl; k++ {
+				pos := MoveTail(kn[k-1], kn[k])
+				if k == kl-1 {
+					if _, ok := vm[pos]; !ok {
+						vm[pos] = 1
+					}
+				}
+			}
 		}
 	}
 
