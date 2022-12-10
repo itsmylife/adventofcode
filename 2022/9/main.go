@@ -57,25 +57,20 @@ func GenerateKnots(count int) []*Pos {
 	return knots
 }
 
-func MoveTheRope(line string, vm map[string]int, kn []*Pos) map[string]int {
+func MoveTheRope(line string, vm map[string]int, knots []*Pos) map[string]int {
 	ps := strings.Split(line, " ")
 	direction := ps[0]
 	count := ci(ps[1])
-	kl := len(kn)
-	for i := 0; i < count; i++ {
-		for j := 1; j < kl; j++ {
-			Move(Dir{
-				direction: direction,
-			}, kn[j-1])
+	ropeLength := len(knots)
 
-			for k := j; k < kl; k++ {
-				pos := MoveTail(kn[k-1], kn[k])
-				if k == kl-1 {
-					if _, ok := vm[pos]; !ok {
-						vm[pos] = 1
-					}
-				}
-			}
+	for i := 0; i < count; i++ {
+		Move(Dir{direction: direction}, knots[0])
+		pos := ""
+		for j := 0; j < ropeLength-1; j++ {
+			pos = MoveTail(knots[j], knots[j+1])
+		}
+		if _, ok := vm[pos]; !ok {
+			vm[pos] = 1
 		}
 	}
 
