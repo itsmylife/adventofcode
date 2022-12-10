@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"strconv"
 	"strings"
 
 	"github.com/itsmylife/adventofcode/2022/helper"
@@ -60,7 +59,7 @@ func GenerateKnots(count int) []*Pos {
 func MoveTheRope(line string, vm map[string]int, knots []*Pos) map[string]int {
 	ps := strings.Split(line, " ")
 	direction := ps[0]
-	count := ci(ps[1])
+	count := helper.ConvertInt(ps[1])
 	ropeLength := len(knots)
 
 	for i := 0; i < count; i++ {
@@ -174,9 +173,4 @@ func AreTheyTouching(hp *Pos, tp *Pos) bool {
 	}
 
 	return true
-}
-
-func ci(str string) int {
-	ts, _ := strconv.ParseInt(str, 10, 64)
-	return int(ts)
 }

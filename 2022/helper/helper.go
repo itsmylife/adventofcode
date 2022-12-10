@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -44,4 +45,9 @@ func IndexOf(word string, data []string) int {
 		}
 	}
 	return -1
+}
+
+func ConvertInt(str string) int {
+	ts, _ := strconv.ParseInt(str, 10, 64)
+	return int(ts)
 }
