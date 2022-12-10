@@ -22,6 +22,13 @@ type Execution struct {
 	line            string
 }
 
+type CRT struct {
+	spritePos int
+	cycle     int
+	rowIndex  int
+	rows      []string
+}
+
 var Multipliers = []int{20, 60, 100, 140, 180, 220}
 
 func main() {
@@ -39,19 +46,66 @@ func main() {
 		strength:        0,
 	}
 
+	crt := &CRT{
+		spritePos: 1,
+		cycle:     0,
+		rowIndex:  0,
+		rows:      []string{"", "", "", "", "", ""},
+	}
+
 	for fileScanner.Scan() {
 		line := fileScanner.Text()
 		op, val := Read(line)
+
 		execution.operation = Operation{
 			name: op,
 			val:  val,
 		}
 		Execute(execution)
-		fmt.Println(fmt.Sprintf("Cycle %v executed!", execution.cycle))
+		DisplayOnCrt(crt, Operation{
+			name: op,
+			val:  val,
+		})
 	}
 
 	fmt.Println(fmt.Sprintf("Total strebgth : %d", execution.strength))
+	for _, v := range crt.rows {
+		fmt.Println(v)
+	}
 }
+
+func DisplayOnCrt(crt *CRT, op Operation) {
+	if op.name == "noop" {
+		DrawOnCrt(crt)
+		crt.cycle++
+	} else if op.name == "addx" {
+		DrawOnCrt(crt)
+		crt.cycle++
+
+		DrawOnCrt(crt)
+		crt.cycle++
+		crt.spritePos += op.val
+	}
+}
+
+func DrawOnCrt(crt *CRT) {
+	if crt.cycle == 40 {
+		crt.cycle = 0
+		crt.rowIndex++
+	}
+	if crt.rowIndex == 6 {
+		return
+	}
+	if crt.cycle >= crt.spritePos-1 && crt.cycle <= crt.spritePos+1 {
+		// put a #
+		crt.rows[crt.rowIndex] += "#"
+	} else {
+		// put a .
+		crt.rows[crt.rowIndex] += "."
+	}
+}
+
+// Part 1 -------------------------------------------
 
 func Execute(ex *Execution) {
 	if ex.operation.name == "noop" {
@@ -59,7 +113,7 @@ func Execute(ex *Execution) {
 		CheckPoint(ex)
 	} else if ex.operation.name == "addx" {
 		ex.cycle++
-		CheckPoint(ex) // middle check
+		CheckPoint(ex)
 
 		ex.cycle++
 		CheckPoint(ex)

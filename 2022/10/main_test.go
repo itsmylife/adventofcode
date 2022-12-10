@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -102,6 +103,51 @@ func TestExecute(t *testing.T) {
 		if c.execution.strength != c.expected.strength {
 			errStr := fmt.Sprintf("Fail.\nExp -> Strength: %v\nGot -> Strength: %v", c.expected.strength, c.execution.strength)
 			t.Error(errStr)
+		}
+	}
+}
+
+func TestDisplayOnCrt(t *testing.T) {
+	cases := []struct {
+		input    []string
+		expected []string
+	}{
+		{
+			input: testInput2,
+			expected: []string{
+				"##..##..##..##..##..##..##..##..##..##..",
+				"###...###...###...###...###...###...###.",
+				"####....####....####....####....####....",
+				"#####.....#####.....#####.....#####.....",
+				"######......######......######......####",
+				"#######.......#######.......#######.....",
+			},
+		},
+	}
+
+	for _, c := range cases {
+		crt := &CRT{
+			spritePos: 1,
+			rows:      []string{"", "", "", "", "", ""},
+		}
+		for _, v := range c.input {
+			op, val := Read(v)
+			DisplayOnCrt(crt, Operation{
+				name: op,
+				val:  val,
+			})
+		}
+
+		if !reflect.DeepEqual(c.expected, crt.rows) {
+			fmt.Println("Expected:")
+			for _, v := range c.expected {
+				fmt.Println(v)
+			}
+			fmt.Println("Result:")
+			for _, v := range crt.rows {
+				fmt.Println(v)
+			}
+			t.Error("Failed!")
 		}
 	}
 }
