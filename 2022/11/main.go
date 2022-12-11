@@ -38,69 +38,67 @@ func main() {
 		li++
 	}
 
-	biznis := RunTheSimulation(monkeys)
+	biznis := RunTheSimulation(monkeys, 10000, false)
 	sort.Ints(biznis)
 
 	biz := biznis[7] * biznis[6]
 	fmt.Println(fmt.Sprintf("Total Monkey Biz : %d", biz))
 }
 
-func RunTheSimulation(monkeys []*Monkey) []int {
-	round := 1
+func RunTheSimulation(monkeys []*Monkey, rounds int, feelRelief bool) []int {
+	round := 0
+	mod := 1
 	var biznis = make([]int, len(monkeys))
-	for round < 21 {
+
+	for _, m := range monkeys {
+		mod *= m.test
+	}
+
+	for round < rounds {
 		for i, m := range monkeys {
 			for _, it := range m.items {
-				worryLevel := CalculateTheWorryLevel(m.operation, it)
-				nextMonkeyIndex := DetermineNextMonkey(m.throwMap, m.test, worryLevel)
-				if nextMonkeyIndex == i {
-					fmt.Println("#######################################")
-					fmt.Println("!!!!!Monkey is throwing it to itself!!!!!!")
-					fmt.Println("#######################################")
+
+				var i1, i2, l int
+				if m.operation.input1 == "old" {
+					i1 = it
 				}
-				monkeys[nextMonkeyIndex].items = append(monkeys[nextMonkeyIndex].items, worryLevel)
+				if m.operation.input2 == "old" {
+					i2 = it
+				} else {
+					i2 = helper.ConvertInt(m.operation.input2)
+				}
+
+				switch m.operation.op {
+				case "+":
+					l = i1 + i2
+				case "*":
+					l = i1 * i2
+				default:
+					log.Fatalln(fmt.Sprintf("Operation [%s] does not implemented", m.operation.op))
+				}
+
+				if feelRelief {
+					l = int(math.Floor(float64(l) / 3))
+				} else {
+					l %= mod
+				}
+
+				nextMonkeyIndex := -1
+				if l%m.test == 0 {
+					nextMonkeyIndex = m.throwMap[true]
+				} else {
+					nextMonkeyIndex = m.throwMap[false]
+				}
+
+				monkeys[nextMonkeyIndex].items = append(monkeys[nextMonkeyIndex].items, l)
 			}
 			biznis[i] += len(m.items)
 			m.items = []int{}
 		}
-		fmt.Println(fmt.Sprintf("Round %d completed.", round))
-		for k := 0; k < len(monkeys); k++ {
-			fmt.Println(fmt.Sprintf("Monkey %d: %v", k, monkeys[k].items))
-		}
-		fmt.Println("----------------------------------------")
 		round++
 	}
 
 	return biznis
-}
-
-func CalculateTheWorryLevel(operation *Operation, it int) int {
-	var i1, i2, l int
-	if operation.input1 == "old" {
-		i1 = it
-	}
-	if operation.input2 == "old" {
-		i2 = it
-	} else {
-		i2 = helper.ConvertInt(operation.input2)
-	}
-	switch operation.op {
-	case "+":
-		l = i1 + i2
-	case "*":
-		l = i1 * i2
-	default:
-		log.Fatalln(fmt.Sprintf("Operation [%s] does not implemented", operation.op))
-	}
-	return int(math.Floor(float64(l) / 3))
-}
-
-func DetermineNextMonkey(throwMap map[bool]int, test int, level int) int {
-	isDivisible := math.Mod(float64(level), float64(test))
-	if isDivisible == 0 {
-		return throwMap[true]
-	}
-	return throwMap[false]
 }
 
 func ParseInput(line string, li int, monkeys []*Monkey) []*Monkey {
@@ -124,11 +122,6 @@ func ParseInput(line string, li int, monkeys []*Monkey) []*Monkey {
 	}
 
 	switch lineNumber {
-	// case 1:
-	// 	parts := strings.Split(line, " ")
-	// 	if _, ok := monkeys[parts[1]]; !ok {
-	// 		monkeys[parts[1]] = &Monkey{}
-	// 	}
 	case 2:
 		parts := strings.Split(line, ": ")
 		nums := strings.Split(parts[1], ", ")

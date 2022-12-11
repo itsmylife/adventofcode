@@ -6,48 +6,64 @@ import (
 	"testing"
 )
 
-func TestCalculateTheWorryLevel(t *testing.T) {
-	cases := []struct {
-		input              *Monkey
-		expectedWorry      int
-		expectedNextMonkey int
-	}{
-		{
-			input: &Monkey{
-				items: []int{10},
-				throwMap: map[bool]int{
-					true:  3,
-					false: 5,
-				},
-				test: 5,
-				operation: &Operation{
-					input1: "old",
-					op:     "+",
-					input2: "3",
-				},
-			},
-			expectedWorry:      4,
-			expectedNextMonkey: 5,
-		},
-	}
-
-	for _, c := range cases {
-		result := CalculateTheWorryLevel(c.input.operation, c.input.items[0])
-		if result != c.expectedWorry {
-			errStr := fmt.Sprintf("Fail. Expected: %v but got: %v", c.expectedWorry, result)
-			t.Error(errStr)
-		}
-	}
-}
+// func TestCalculateTheWorryLevel(t *testing.T) {
+// 	cases := []struct {
+// 		input              *Monkey
+// 		expectedWorry      int
+// 		expectedNextMonkey int
+// 	}{
+// 		{
+// 			input: &Monkey{
+// 				items: []int{10},
+// 				throwMap: map[bool]int{
+// 					true:  3,
+// 					false: 5,
+// 				},
+// 				test: 5,
+// 				operation: &Operation{
+// 					input1: "old",
+// 					op:     "+",
+// 					input2: "3",
+// 				},
+// 			},
+// 			expectedWorry:      4,
+// 			expectedNextMonkey: 5,
+// 		},
+// 	}
+//
+// 	for _, c := range cases {
+// 		result := CalculateTheWorryLevel(c.input, c.input.items[0], true)
+// 		if result != c.expectedWorry {
+// 			errStr := fmt.Sprintf("Fail. Expected: %v but got: %v", c.expectedWorry, result)
+// 			t.Error(errStr)
+// 		}
+// 	}
+// }
 
 func TestRunTheSimulation(t *testing.T) {
 	cases := []struct {
 		input    []string
+		rounds   int
+		relief   bool
 		expected []int
 	}{
 		{
 			input:    testInput,
+			rounds:   20,
+			relief:   false,
+			expected: []int{99, 97, 8, 103},
+		},
+		{
+			input:    testInput,
+			rounds:   20,
+			relief:   true,
 			expected: []int{101, 95, 7, 105},
+		},
+		{
+			input:    testInput,
+			rounds:   10000,
+			relief:   false,
+			expected: []int{52166, 47830, 1938, 52013},
 		},
 	}
 
@@ -56,9 +72,9 @@ func TestRunTheSimulation(t *testing.T) {
 		for i, line := range c.input {
 			monkeys = ParseInput(line, i+1, monkeys)
 		}
-		biznis := RunTheSimulation(monkeys)
+		biznis := RunTheSimulation(monkeys, c.rounds, c.relief)
 		if !reflect.DeepEqual(c.expected, biznis) {
-			errStr := fmt.Sprintf("Fail. Expected: %v but got: %v", c.expected, biznis)
+			errStr := fmt.Sprintf("Fail. \nExpected: \n%v \nbut got: \n%v", c.expected, biznis)
 			t.Error(errStr)
 		}
 	}

@@ -51,3 +51,8 @@ func ConvertInt(str string) int {
 	ts, _ := strconv.ParseInt(str, 10, 64)
 	return int(ts)
 }
+
+func ConvertInt64(str string) int64 {
+	ts, _ := strconv.ParseInt(str, 10, 64)
+	return ts
+}
